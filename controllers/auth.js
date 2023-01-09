@@ -17,7 +17,10 @@ exports.login = async (req, res, next) => {
         return
     }
 
-    if (!user.email_confirm) console.log('Email not confirm')
+    if (!user.email_confirm) {
+        res.status(400).json({Status: false, Message: 'Email not confirm', Data: null})
+        return
+    }
 
     if (!await userService.validatePasswordSync(password, user.password_hash)) {
         res.status(400).json({Status: false, Message: 'Email or Password invalid', Data: null})
