@@ -7,6 +7,7 @@ exports.login = async (req, res, next) => {
 
     if (!email || !password) {
         res.status(400).send({Status: false, Message: 'Some properties is undefined', Data: null})
+        return;
     }
 
     const user = await userService.findByEmailSync(email).catch((err) => { throw new Error(err) })
