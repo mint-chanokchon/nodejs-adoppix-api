@@ -44,3 +44,7 @@ exports.register = async (req, res, next) => {
 
     res.status(201).json({Status: true, Message: 'Create successful', Data: null})
 }
+
+exports.confirmEmail = async (req, res, next) => {
+    
+}
