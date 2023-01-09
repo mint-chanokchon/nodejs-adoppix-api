@@ -15,7 +15,10 @@ exports.register = async (req, res, next) => {
     const user = await userService.findByEmailSync(email)
     if (user) res.status(404).json({Status: false, Message: 'Email aleady to use.', Data: null})
 
+    // create user
     await userService.createSync(email, password, adoppixId)
+
+    // send mail
 
     res.status(201).json({Status: true, Message: 'Create successful', Data: null})
 }
