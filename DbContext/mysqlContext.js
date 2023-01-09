@@ -10,22 +10,37 @@ const mysqlConfigServer = {
 }
 
 async function connect() {
-    const connection = await new Promise((resolve, reject) => {
-        mysql.createConnection(mysqlConfigServer)
-            .connect((err) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve()
-                }
-            })
+    const conn = await new Promise((resolve, reject) => {
+        const mysqlConn = mysql.createConnection(mysqlConfigServer)
+        mysqlConn.connect((err) => {
+            if (err) {
+                reject(err)
+                return;
+            }
+        })
+        resolve(mysqlConn)
     }).catch((err) => {
         throw new Error(err)
     })
 
-    console.log('MySql connect successful.')
-
-    return connection
+    return conn
 }
 
-module.exports = connect
+async function query(queryString, queryParams) {
+    if (!queryString) throw new Error(`queryString shouldn't be null or undefined`)
+
+    const mysqlConn = await connect().catch(err => { throw new Error(err) })
+    const result = await new Promise((resolve, reject) => {
+        mysqlConn.query(queryString, queryParams, (err, results, fields) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(results)
+            }
+        })
+    })
+
+    return result
+}
+
+module.exports = query
