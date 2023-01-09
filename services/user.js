@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const uuid = require('uuidv4').uuid
+const jwt = require('jsonwebtoken')
 
 const mysqlQuery = require('../DbContext/mysqlContext')
 
@@ -30,3 +31,15 @@ exports.findByEmailSync = async (email) => {
 
     return user
 } 
+
+exports.validatePasswordSync = async (password, passwordHash) => {
+    if (!password || !passwordHash) throw new Error('Some properties is undefined')
+
+    const result = bcrypt.compareSync(password, passwordHash)
+    return result
+}
+
+exports.genJwtToken = async (claims) => {
+    const token = jwt.sign(claims, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '24h' })
+    return token
+}
