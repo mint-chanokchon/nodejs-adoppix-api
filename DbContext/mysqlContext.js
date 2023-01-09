@@ -35,7 +35,7 @@ async function query(queryString, queryParams) {
             if (err) {
                 reject(err)
             } else {
-                resolve(results)
+                resolve(results[0])
             }
         })
     })
