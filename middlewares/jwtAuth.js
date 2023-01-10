@@ -1,8 +1,11 @@
 const jwt = require('jsonwebtoken')
 
-async function authentication(req, res, next) {
+exports.useJwtAuthentication = async (req, res, next) => {
     let bearerToken = req.headers?.authorization
-    if (!bearerToken) req.isAuth = false
+    if (!bearerToken) {
+        req.isAuth = false
+        return next()
+    }
 
     bearerToken = bearerToken.split(' ')
     if (bearerToken.length !== 2) return res.status(401).json({Status: false, Message: 'jwt token format invalid', Data: null })
@@ -13,12 +16,19 @@ async function authentication(req, res, next) {
     // get payload
     const user = await getPayload(token)
 
-    // check token expire
-    if (!isExpire(user.exp)) return res.status(401).json({Status: false, Message: 'jwt token is expire', Data: null})
-
     // send user payload to req
     req.isAuth = true
     req.user = user
+
+    next()
+}
+
+exports.verify = (req, res, next) => {
+    // check user is auth
+    if (!req.isAuth) return res.status(401).send({Status: false, Message: 'Unauthorize', Data: null})
+
+    // check token expire
+    if (isExpire(req.user.exp)) return res.status(401).send({Status: false, Message: 'Token expired', Data: null})
 
     next()
 }
@@ -41,5 +51,3 @@ async function getPayload(token) {
 
     return payload
 }
-
-module.exports = authentication
