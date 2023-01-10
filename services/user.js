@@ -40,7 +40,16 @@ exports.findByEmailSync = async (email) => {
     return user
 } 
 
-exports.validatePasswordSync = async (password, passwordHash) => {
+exports.findByIdSync = async (userId) => {
+    if (!userId) throw new Error(`userId is require`) 
+
+    const query = `SELECT * FROM users WHERE id = ?`
+    const user = mysqlQuery(query, [userId]).catch((err) => { throw new Error(err) })
+
+    return user
+}
+
+exports.verifyPasswordSync = async (password, passwordHash) => {
     if (!password || !passwordHash) throw new Error('Some properties is undefined')
 
     const result = bcrypt.compareSync(password, passwordHash)
@@ -89,4 +98,18 @@ exports.findProfileById = async (userId) => {
     const userProfile = await mysqlQuery(queryString, [userId]).catch((err) => { throw new Error(err) })
 
     return userProfile
+}
+
+exports.updatePassword = async (userId, password) => {
+    if (!userId || !password) throwError('userId and password is require')
+
+    const passwordSalt = await bcrypt.genSaltSync(10)
+    const passwordHash = await bcrypt.hashSync(password, passwordSalt)
+
+    const queryString = `UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?`
+    await mysqlQuery(queryString, [passwordHash, passwordSalt, userId]).catch((err) => throwError(err))
+}
+
+function throwError(message) {
+    throw new Error(message)
 }

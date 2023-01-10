@@ -13,11 +13,11 @@ exports.login = async (req, res, next) => {
 
     if (!user.email_confirm) return res.status(400).json({Status: false, Message: 'Email not confirm', Data: null})
 
-    if (!await userService.validatePasswordSync(password, user.password_hash)) return res.status(400).json({Status: false, Message: 'Email or Password invalid', Data: null})
+    if (!await userService.verifyPasswordSync(password, user.password_hash)) return res.status(400).json({Status: false, Message: 'Email or Password invalid', Data: null})
 
     const profile = await userService.findProfileById(user.id)
-    console.log(profile)
-    const token = await userService.genJwtToken({ email: user.email, username: profile.username })
+ 
+    const token = await userService.genJwtToken({ userId: user.id, email: user.email, username: profile.username })
     res.status(200).json({Status: false, Message: 'Some properties is undefined', Data: token})
 }
 
@@ -61,4 +61,22 @@ exports.confirmEmail = async (req, res, next) => {
     await userService.updateStatusEmail(userId, true)
     
     res.status(200).json({Status: true, Message: 'Confirm email successful', Data: null})
+}
+
+exports.changePassword = async (req, res, next) => {
+    const userId = req.user.userId
+    const currentPassword = req.body?.currentPassword
+    const newPassword = req.body?.newPassword
+
+    if (!userId || !currentPassword || !newPassword) return res.status(400).json('Some properties is undefined')
+
+    const user = await userService.findByIdSync(userId)
+    if (!user) return res.status(400).json({ Status: false, Message: 'User not found', Data: null })
+
+    // verify old password
+    if (!await userService.verifyPasswordSync(currentPassword, user.password_hash)) return res.status(400).json({ Status: false, Message: 'Password invalid', Data: null }) 
+
+    // set new password
+    await userService.updatePassword(userId, newPassword)
+    res.status(200).json({Status: true, Message: 'Change password successful', Data: null})
 }
