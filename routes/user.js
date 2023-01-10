@@ -5,7 +5,7 @@ const router = express.Router()
 
 const userController = require('../controllers/user')
 
-router.use(jwtAuth.verify)
+router.use(jwtAuth.useAuthentication)
 
 router.get('/:username/profile', userController.getProfile)
 

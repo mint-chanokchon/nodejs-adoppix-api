@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-exports.useJwtAuthentication = async (req, res, next) => {
+exports.configs = async (req, res, next) => {
     let bearerToken = req.headers?.authorization
     if (!bearerToken) {
         req.isAuth = false
@@ -23,7 +23,7 @@ exports.useJwtAuthentication = async (req, res, next) => {
     next()
 }
 
-exports.verify = (req, res, next) => {
+exports.useAuthentication = (req, res, next) => {
     // check user is auth
     if (!req.isAuth) return res.status(401).send({Status: false, Message: 'Unauthorize', Data: null})
 

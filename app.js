@@ -12,7 +12,7 @@ const userRoutes = require('./routes/user')
 app.use(express.json())
 app.use(cors())
 
-app.use(jwtAuth.useJwtAuthentication)
+app.use(jwtAuth.configs)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
