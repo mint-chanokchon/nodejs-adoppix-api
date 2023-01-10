@@ -6,29 +6,17 @@ exports.login = async (req, res, next) => {
     const email = req.body?.email
     const password = req.body?.password
 
-    if (!email || !password) {
-        res.status(400).send({Status: false, Message: 'Some properties is undefined', Data: null})
-        return
-    }
+    if (!email || !password) return res.status(400).send({Status: false, Message: 'Some properties is undefined', Data: null})
 
     const user = await userService.findByEmailSync(email).catch((err) => { throw new Error(err) })
-    if (!user) {
-        res.status(400).json({Status: false, Message: 'Email or Password invalid', Data: null})
-        return
-    }
+    if (!user) return res.status(400).json({Status: false, Message: 'Email or Password invalid', Data: null})
 
-    if (!user.email_confirm) {
-        res.status(400).json({Status: false, Message: 'Email not confirm', Data: null})
-        return
-    }
+    if (!user.email_confirm) return res.status(400).json({Status: false, Message: 'Email not confirm', Data: null})
 
-    if (!await userService.validatePasswordSync(password, user.password_hash)) {
-        res.status(400).json({Status: false, Message: 'Email or Password invalid', Data: null})
-        return
-    }
+    if (!await userService.validatePasswordSync(password, user.password_hash)) return res.status(400).json({Status: false, Message: 'Email or Password invalid', Data: null})
 
-    const profile = await userService.findProfileByUsername(user.id)
-
+    const profile = await userService.findProfileById(user.id)
+    console.log(profile)
     const token = await userService.genJwtToken({ email: user.email, username: profile.username })
     res.status(200).json({Status: false, Message: 'Some properties is undefined', Data: token})
 }

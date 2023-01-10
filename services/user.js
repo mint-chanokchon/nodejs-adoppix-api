@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt')
+const e = require('cors')
 const uuid = require('uuidv4').uuid
 const jwt = require('jsonwebtoken')
 
@@ -77,6 +78,15 @@ exports.findProfileByUsername = async (username) => {
 
     const queryString = `SELECT description, profile_img, cover_img, is_dark FROM user_profiles WHERE username = ?`
     const userProfile = await mysqlQuery(queryString, [username]).catch((err) => { throw new Error(err) })
+
+    return userProfile
+}
+
+exports.findProfileById = async (userId) => {
+    if (!userId) throw new Error('UserId is require')
+
+    const queryString = `SELECT description, profile_img, cover_img, is_dark, username FROM user_profiles WHERE users_id = ?`
+    const userProfile = await mysqlQuery(queryString, [userId]).catch((err) => { throw new Error(err) })
 
     return userProfile
 }
