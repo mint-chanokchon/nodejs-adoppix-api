@@ -17,6 +17,7 @@ async function authentication(req, res, next) {
     if (!isExpire(user.exp)) return res.status(401).json({Status: false, Message: 'jwt token is expire', Data: null})
 
     // send user payload to req
+    req.isAuth = true
     req.user = user
 
     next()
