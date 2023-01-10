@@ -52,12 +52,23 @@ exports.register = async (req, res, next) => {
 
     // send confirm email
     const emailToken = await userService.genEmailToken(userId)
-    await emailService.sendSync(email, 'Confirm your email', `<a href='http://localhost:3000/api/auth/${emailToken}'>Click</a>`)
+    await emailService.sendSync(email, 'Confirm your email', `<a href='http://localhost:3000/api/auth/confirmEmail/${emailToken}'>Click</a>`)
 
     res.status(201).json({Status: true, Message: 'Create successful', Data: null})
 }
 
 exports.confirmEmail = async (req, res, next) => {
     const token = req.params?.token
+    
+    // check token is undefined
+    if (!token) return res.status(404).json({Status: false, Message: 'Token is undefined', Data: null})
+
+    // check token is invalid
+    const userId = await userService.verifyEmailToken(token)
+    if (!userId) return res.status(404).json({Status: false, Message: 'Token invalid', Data: null})
+
+    // update email to comfirm
+    await userService.updateStatusEmail(userId, true)
+    
     res.status(200).json({Status: true, Message: 'Confirm email successful', Data: null})
 }

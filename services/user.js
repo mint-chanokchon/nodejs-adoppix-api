@@ -57,3 +57,17 @@ exports.genEmailToken = async (userId) => {
     await mysqlQuery(queryString, [token, userId]).catch((err) => { throw new Error(err) })
     return token
 }
+
+exports.verifyEmailToken = async (token) => {
+    const queryString = `SELECT id FROM users WHERE email_token = ?`
+    const user = await mysqlQuery(queryString, [token]).catch((err) => { throw new Error(err) })
+
+    if (!user) return undefined
+
+    return user.id
+}
+
+exports.updateStatusEmail = async (userId, status) => {
+    const queryString = `UPDATE users SET email_confirm = ?, email_token = null WHERE id = ?`
+    await mysqlQuery(queryString, [status, userId]).catch((err) => { throw new Error(err) })
+}
