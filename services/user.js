@@ -71,3 +71,12 @@ exports.updateStatusEmail = async (userId, status) => {
     const queryString = `UPDATE users SET email_confirm = ?, email_token = null WHERE id = ?`
     await mysqlQuery(queryString, [status, userId]).catch((err) => { throw new Error(err) })
 }
+
+exports.findProfileByUsername = async (username) => {
+    if (!username) throw new Error('username is require')
+
+    const queryString = `SELECT description, profile_img, cover_img, is_dark FROM user_profiles WHERE username = ?`
+    const userProfile = await mysqlQuery(queryString, [username]).catch((err) => { throw new Error(err) })
+
+    return userProfile
+}

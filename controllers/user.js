@@ -1,9 +1,13 @@
-const mysqlQuery = require('../DbContext/mysqlContext')
+const userService = require('../services/user')
 
-exports.getProfile = (req, res, next) => {
+exports.getProfile = async (req, res, next) => {
     const username = req.params?.username
 
-    console.log(username)
+    if (!username) return res.status(400).json({ Status: false, Message: 'username is required', Data: null })
 
-    res.status(200).json({ Message: 'Successful' })
+    const profile = await userService.findProfileByUsername(username).catch((err) => console.log(err))
+    if (!profile) return res.status(404).json({ Status: false, Message: 'Profile not found', Data: null })
+
+    profile.username = username
+    res.status(200).json({ Status: true, Message: 'Successful', Data: profile })
 }

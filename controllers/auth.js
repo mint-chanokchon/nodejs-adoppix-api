@@ -27,7 +27,9 @@ exports.login = async (req, res, next) => {
         return
     }
 
-    const token = await userService.genJwtToken({ email: user.email })
+    const profile = await userService.findProfileByUsername(user.id)
+
+    const token = await userService.genJwtToken({ email: user.email, username: profile.username })
     res.status(200).json({Status: false, Message: 'Some properties is undefined', Data: token})
 }
 
