@@ -1,5 +1,7 @@
 const express = require('express')
 const cors = require('cors')
+const authentication = require('./middlewares/authentication')
+
 require('dotenv').config()
 
 const app = express()
@@ -8,6 +10,8 @@ const authRoutes = require('./routes/auth')
 
 app.use(express.json())
 app.use(cors())
+
+app.use(authentication)
 
 app.use('/api/auth', authRoutes)
 
